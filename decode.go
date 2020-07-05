@@ -16,12 +16,12 @@ var (
 )
 
 // Decode decode interface into struct
-func Decode(m interface{}, val interface{}) error {
-	if err := check(val); err != nil {
+func Decode(src interface{}, dst interface{}) error {
+	if err := check(dst); err != nil {
 		return err
 	}
 
-	return decode(m, reflect.ValueOf(val).Elem())
+	return decode(src, reflect.ValueOf(dst).Elem())
 }
 
 func check(val interface{}) error {

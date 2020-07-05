@@ -29,6 +29,7 @@ func Test_Decode(t *testing.T) {
 
 	err := Decode(src, &p)
 	assert.Nil(t, err)
+	fmt.Printf("%+v\n", p)
 }
 
 func BenchmarkDecode(b *testing.B) {
@@ -87,10 +88,11 @@ func TestAssign(t *testing.T) {
 	}
 
 	var p T
-	p.A = src["a"].(string)
-	p.B = fmt.Sprintf("%v", src["b"])
-	v := src["c"].(map[string]interface{})
-	p.C.D = v["d"].([]string)
+	//p.A = src["a"].(string)
+	//p.B = fmt.Sprintf("%v", src["b"])
+	//v := src["c"].(map[string]interface{})
+	//p.C.D = v["d"].([]string)
+	Decode(src, &p)
 
 	t.Logf("%+v\n", p)
 }
