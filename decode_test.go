@@ -2,10 +2,7 @@ package gcast
 
 import (
 	"encoding/json"
-	"fmt"
 	"testing"
-
-	"github.com/stretchr/testify/assert"
 )
 
 type T struct {
@@ -16,30 +13,25 @@ type T struct {
 	} `json:"c"`
 }
 
-func Test_Decode(t *testing.T) {
-	var src = map[string]interface{}{
-		"a": "1",
-		"b": 2,
-		"c": map[string]interface{}{
-			"d": []string{"1", "2", "3"},
-		},
-	}
+func TestDecodeS2S(t *testing.T) {
+	var src, dst T
+	src.A = "test"
+	src.B = "test"
+	src.C = struct {
+		D []string `json:"d"`
+	}{D: []string{"test"}}
 
-	var p T
-
-	err := Decode(src, &p)
-	assert.Nil(t, err)
-	fmt.Printf("%+v\n", p)
+	Decode(src, &dst)
+	t.Logf("%+v\n", dst)
 }
 
 func BenchmarkDecode(b *testing.B) {
-	var src = map[string]interface{}{
-		"a": "1",
-		"b": 2,
-		"c": map[string]interface{}{
-			"d": []string{"1", "2", "3"},
-		},
-	}
+	var src T
+	src.A = "test"
+	src.B = "test"
+	src.C = struct {
+		D []string `json:"d"`
+	}{D: []string{"test"}}
 	for i := 0; i < b.N; i++ {
 		var p T
 		Decode(src, &p)
@@ -47,13 +39,12 @@ func BenchmarkDecode(b *testing.B) {
 }
 
 func BenchmarkJsonDecode(b *testing.B) {
-	var src = map[string]interface{}{
-		"a": "1",
-		"b": 2,
-		"c": map[string]interface{}{
-			"d": []string{"1", "2", "3"},
-		},
-	}
+	var src T
+	src.A = "test"
+	src.B = "test"
+	src.C = struct {
+		D []string `json:"d"`
+	}{D: []string{"test"}}
 	var str, _ = json.Marshal(src)
 	for i := 0; i < b.N; i++ {
 		var p T
@@ -62,37 +53,20 @@ func BenchmarkJsonDecode(b *testing.B) {
 }
 
 func BenchmarkAssign(b *testing.B) {
-	var src = map[string]interface{}{
-		"a": "1",
-		"b": 2,
-		"c": map[string]interface{}{
-			"d": []string{"1", "2", "3"},
-		},
-	}
+	var src T
+	src.A = "test"
+	src.B = "test"
+	src.C = struct {
+		D []string `json:"d"`
+	}{D: []string{"test"}}
 	for i := 0; i < b.N; i++ {
 		var p T
-		p.A = src["a"].(string)
-		p.B = fmt.Sprintf("%v", src["b"])
-		v := src["c"].(map[string]interface{})
-		p.C.D = v["d"].([]string)
+		p.A = src.A
+		p.B = src.B
+		p.C = struct {
+			D []string `json:"d"`
+		}{}
+		p.C.D = make([]string, 0)
+		copy(p.C.D, src.C.D)
 	}
-}
-
-func TestAssign(t *testing.T) {
-	var src = map[string]interface{}{
-		"a": "1",
-		"b": 2,
-		"c": map[string]interface{}{
-			"d": []string{"1", "2", "3"},
-		},
-	}
-
-	var p T
-	//p.A = src["a"].(string)
-	//p.B = fmt.Sprintf("%v", src["b"])
-	//v := src["c"].(map[string]interface{})
-	//p.C.D = v["d"].([]string)
-	Decode(src, &p)
-
-	t.Logf("%+v\n", p)
 }
